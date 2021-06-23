@@ -18,38 +18,50 @@
 
       5. Add a countdown timer - when the time is up, end the quiz, display the score and highlight the correct answers
 *************************** */
+const btnReset = document.querySelector("#btnReset");
+const btnSubmit = document.querySelector("#btnSubmit");
 
-window.addEventListener('DOMContentLoaded', () => {
-  const start = document.querySelector('#start');
-  start.addEventListener('click', function (e) {
-    document.querySelector('#quizBlock').style.display = 'block';
-    start.style.display = 'none';
+window.addEventListener("DOMContentLoaded", () => {
+  const start = document.querySelector("#start");
+  start.addEventListener("click", function (e) {
+  document.querySelector("#quizBlock").style.display = "block";
+  start.style.display = "none";
   });
   // quizArray QUESTIONS & ANSWERS
   // q = QUESTION, o = OPTIONS, a = CORRECT ANSWER
   // Basic ideas from https://code-boxx.com/simple-javascript-quiz/
   const quizArray = [
     {
-      q: 'Which is the third planet from the sun?',
-      o: ['Saturn', 'Earth', 'Pluto', 'Mars'],
+      q: "Which is the third planet from the sun?",
+      o: ["Saturn", "Earth", "Pluto", "Mars"],
       a: 1, // array index 1 - so Earth is the correct answer here
     },
     {
-      q: 'Which is the largest ocean on Earth?',
-      o: ['Atlantic Ocean', 'Indian Ocean', 'Arctic Ocean', 'Pacific Ocean'],
+      q: "Which is the largest ocean on Earth?",
+      o: ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean"],
       a: 3,
     },
     {
-      q: 'What is the capital of Australia',
-      o: ['Sydney', 'Canberra', 'Melbourne', 'Perth'],
+      q: "What is the capital of Australia?",
+      o: ["Sydney", "Canberra", "Melbourne", "Perth"],
       a: 1,
+    },
+    {
+      q: "Which country produces the most coffee in the world?",
+      o: ["Brazil", "India", "China", "Spain"],
+      a: 0,
+    },
+    {
+      q: "Which organ has four chambers?",
+      o: ["The liver", "The kidneys", "The lungs", "The heart"],
+      a: 3,
     },
   ];
 
   // function to Display the quiz questions and answers from the object
   const displayQuiz = () => {
-    const quizWrap = document.querySelector('#quizWrap');
-    let quizDisplay = '';
+    const quizWrap = document.querySelector("#quizWrap");
+    let quizDisplay = "";
     quizArray.map((quizItem, index) => {
       quizDisplay += `<ul class="list-group">
                    Q - ${quizItem.q}
@@ -63,7 +75,7 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   };
 
-  // Calculate the score
+// Calculate the score
   const calculateScore = () => {
     let score = 0;
     quizArray.map((quizItem, index) => {
@@ -71,20 +83,78 @@ window.addEventListener('DOMContentLoaded', () => {
         //highlight the li if it is the correct answer
         let li = `li_${index}_${i}`;
         let r = `radio_${index}_${i}`;
-        liElement = document.querySelector('#' + li);
-        radioElement = document.querySelector('#' + r);
+        liElement = document.querySelector("#" + li);
+        radioElement = document.querySelector("#" + r);
 
         if (quizItem.a == i) {
           //change background color of li element here
+          liElement.style.backgroundColor = "#86CD99";
         }
 
-        if (radioElement.checked) {
+        if (radioElement.checked && quizItem.a == i) {
           // code for task 1 goes here
+          score += 1;
         }
       }
     });
+    if (score == 5) {
+      document.getElementById(
+        "score"
+      ).innerHTML = `You won! Your score is: ${score}`;
+    } else if (score == 0) {
+      document.getElementById(
+        "score"
+      ).innerHTML = `Sorry! you lost! Your score is: ${score}`;
+    } else {
+      document.getElementById("score").innerHTML = `Your score is: ${score}`;
+    }
   };
 
-  // call the displayQuiz function
-  displayQuiz();
+//Timer function
+  function startTimer(duration, display) {
+    var timer = duration, minutes,
+      seconds;
+    setInterval(function () {
+      minutes = parseInt(timer / 60, 10);
+      seconds = parseInt(timer % 60, 10);
+
+      minutes = minutes < 10 ? "0" + minutes : minutes;
+      seconds = seconds < 10 ? "0" + seconds : seconds;
+
+      display.textContent = minutes + ":" + seconds;
+
+      if (--timer < 0) {
+        calculateScore();
+        timer = 0;
+        document.getElementById("timeElapsedMessage").innerHTML = " Sorry! 1:00 minute elapsed!";
+      }
+    }, 1000);
+  }
+
+//Display timer function
+  const displayTimer = () => {
+    var oneMinute = 60,
+      display = document.querySelector("#time");
+    startTimer(oneMinute, display);
+};
+
+// call the displayQuiz function
+displayQuiz();
+// call the timer function
+displayTimer();
+
+btnSubmit.addEventListener("click", () => {
+    calculateScore();
+    var radios = document.getElementsByTagName('input');
+    for (i = 0; i < radios.length; i++) { 
+      if (radios[i].type == 'radio') {
+        var radioid = radios[i].id;
+        document.getElementById(radioid).disabled = true;
+      }
+  }
 });
+});
+
+btnReset.addEventListener("click", () => {
+  window.location.reload();
+ });
